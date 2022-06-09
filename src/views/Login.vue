@@ -58,6 +58,7 @@ export default {
               console.log("data", res.data);
               if (res.data[0].clave == this.contra) {
                 console.log("esto es un exito ya ingresaste");
+                this.$router.push("/principal");
               } else {
                 console.log("eres un impostor");
               }
