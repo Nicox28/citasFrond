@@ -4,8 +4,10 @@ module.exports = defineConfig({
     'vuetify'
   ],
   devServer:{
-    proxy: 'http://192.168.1.8:8000/',
+    proxy: 'http://192.168.1.10:8000/',
     port: 3000,
     
   }
 })
+
+

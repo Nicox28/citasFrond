@@ -20,7 +20,7 @@
         Ingresar
       </v-btn>
     </v-form>
-  </div>
+  </div> 
 </template>
 
 <script>
