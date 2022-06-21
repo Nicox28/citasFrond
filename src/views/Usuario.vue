@@ -2,6 +2,7 @@
   <v-data-table
     :headers="headers"
     :items="desserts"
+    :search="search"
     sort-by="calories"
     class="elevation-1"
   >
@@ -35,14 +36,54 @@
                 <v-row>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.numeroDeEspecialidad"
-                      label="NUMERO DE ESPECIALIDAD"
+                      v-model="editedItem.login"
+                      label="LOGIN"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.nombreDeEspecialidad"
-                      label="NOMBRE DE ESPECIALIDAD"
+                      v-model="editedItem.clave"
+                      label="CLAVE"
+                    ></v-text-field>
+                  </v-col>
+                  <v-combobox
+                    v-model="editedItem.cat_per"
+                    :items="items1"
+                    :search-input.sync="search1"
+                    hide-selected
+                    hint="Maximum of 5 tags"
+                    label="CATEGORIA DE PERSONAL"
+                    multiple
+                    persistent-hint
+                    small-chips
+                  >
+                    <template v-slot:no-data>
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title>
+                            No results matching "<strong>{{ search }}</strong
+                            >". Press <kbd>enter</kbd> to create a new one
+                          </v-list-item-title>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </template>
+                  </v-combobox>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-model="editedItem.nomb_per"
+                      label="NOMBRE"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-model="editedItem.apellido_per"
+                      label="APELLIDOS"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-model="editedItem.perfil"
+                      label="PERFIL"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -92,29 +133,40 @@ export default {
     dialogDelete: false,
     headers: [
       {
-        text: "NUMERO DE ESPECIALIDAD",
+        text: "LOGIN",
         align: "start",
         sortable: false,
-        value: "num_espe",
+        value: "login",
       },
-      { text: "NOMBRE DE ESPECIALIDAD", value: "nomb_espe" },
-      { text: "Actions", value: "actions", sortable: false },
+      { text: "CLAVE", value: "clave" },
+      { text: "CATEGORIA DE PERSONAL", value: "cat_per" },
+      { text: "NOMBRE", value: "nomb_per" },
+      { text: "APELLIDO", value: "apellido_per" },
+      { text: "PERFIL", value: "perfil" },
     ],
     desserts: [],
     editedIndex: -1,
     editedItem: {
-      num_espe: 0,
-      nomb_espe: "",
+      login: "",
+      clave: "",
+      cat_perac: "",
+      nomb_per: "",
+      apellido_per: "",
+      perfil: "",
     },
     defaultItem: {
-      num_espe: 0,
-      nomb_espe: "",
+      login: "",
+      clave: "",
+      cat_perac: "",
+      nomb_per: "",
+      apellido_per: "",
+      perfil: "",
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
+      return this.editedIndex === -1 ? "NUEVO USUARIO" : "Edit Item";
     },
   },
 

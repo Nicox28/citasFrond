@@ -7,7 +7,7 @@
   >
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>Especialidad</v-toolbar-title>
+        <v-toolbar-title>Tratamiento</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
         <v-text-field
@@ -35,14 +35,14 @@
                 <v-row>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.numeroDeEspecialidad"
-                      label="NUMERO DE ESPECIALIDAD"
+                      v-model="editedItem.numeroDeTratamiento"
+                      label="NUMERO DE TRATAMIENTO"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.nombreDeEspecialidad"
-                      label="NOMBRE DE ESPECIALIDAD"
+                      v-model="editedItem.nombreDeTratamiento"
+                      label="NOMBRE DE TRATAMIENTO"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -92,12 +92,12 @@ export default {
     dialogDelete: false,
     headers: [
       {
-        text: "NUMERO DE ESPECIALIDAD",
+        text: "NUMERO DE TRATAMIENTO",
         align: "start",
         sortable: false,
-        value: "num_espe",
+        value: "num_trata",
       },
-      { text: "NOMBRE DE ESPECIALIDAD", value: "nomb_espe" },
+      { text: "NOMBRE DE TRATAMIENTO", value: "nomb_trata" },
       { text: "Actions", value: "actions", sortable: false },
     ],
     desserts: [],
@@ -114,7 +114,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "NUeva Especialidad" : "Edit Item";
+      return this.editedIndex === -1 ? "Nuevo Tratamiento" : "Edit Item";
     },
   },
 

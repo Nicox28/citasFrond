@@ -14,31 +14,14 @@
           gradient="to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"
         ></v-img>
       </template>
-
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
       <v-app-bar-title>CLINICA ODONTOLOGICA MULTIDENT</v-app-bar-title>
-
-      <v-spacer></v-spacer>
-
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-heart</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-dots-vertical</v-icon>
-      </v-btn>
     </v-app-bar>
     <v-sheet
       id="scrolling-techniques-2"
       class="overflow-y-auto"
-      max-height="100vh"
+      max-height="500vh"
     >
-      <v-container style="height: 150px"> </v-container>
+      <v-container style="height: 140px"></v-container>
       <div class="row">
         <div class="col-sm-2">
           <v-card class="mx-auto" width="500" tile>
@@ -52,7 +35,6 @@
                     ></v-img>
                   </v-list-item-avatar>
                 </v-list-item>
-
                 <v-list-item link>
                   <v-list-item-content>
                     <v-list-item-title class="text-h6">
@@ -91,6 +73,7 @@
           <div v-if="selectedItem == 2"><Especialidad /></div>
           <div v-if="selectedItem == 3"><Citas /></div>
           <div v-if="selectedItem == 4"><Usuarios /></div>
+          <div v-if="selectedItem == 5"><Tratamiento /></div>
         </div>
       </div>
     </v-sheet>
@@ -104,6 +87,7 @@ import Personal from "./Personal.vue";
 import Especialidad from "./Especialidad.vue";
 import Citas from "./Cita.vue";
 import Usuarios from "./Usuario.vue";
+import Tratamiento from "./Tratamiento.vue";
 
 export default {
   data: () => ({
@@ -115,8 +99,8 @@ export default {
       { text: "Especialidad", icon: "mdi-inbox-full-outline" },
       { text: "Citas", icon: "mdi-calendar-month-outline" },
       { text: "Usuarios", icon: "mdi-account-supervisor-circle" },
-      { text: "Uploads", icon: "mdi-upload" },
-      { text: "Backups", icon: "mdi-cloud-upload" },
+      { text: "Tratamiento", icon: "mdi-air-filter" },
+      { text: "Salir", icon: "mdi-exit-run" },
     ],
     mini: false,
 
@@ -140,7 +124,7 @@ export default {
     Especialidad,
     Citas,
     Usuarios,
-    
+    Tratamiento,
   },
 };
 </script>
