@@ -46,37 +46,15 @@
                       label="CLAVE"
                     ></v-text-field>
                   </v-col>
-                  <v-combobox
-                    v-model="editedItem.cat_per"
-                    :items="items1"
-                    :search-input.sync="search1"
-                    hide-selected
-                    hint="Maximum of 5 tags"
-                    label="CATEGORIA DE PERSONAL"
-                    multiple
-                    persistent-hint
-                    small-chips
-                  >
-                    <template v-slot:no-data>
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-list-item-title>
-                            No results matching "<strong>{{ search }}</strong
-                            >". Press <kbd>enter</kbd> to create a new one
-                          </v-list-item-title>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </template>
-                  </v-combobox>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.nomb_per"
+                      v-model="editedItem.nomb"
                       label="NOMBRE"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.apellido_per"
+                      v-model="editedItem.apellido"
                       label="APELLIDOS"
                     ></v-text-field>
                   </v-col>
@@ -93,22 +71,32 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="close"> Cancel </v-btn>
-              <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+              <v-btn
+                v-if="editedIndex === -1"
+                color="blue darken-1"
+                text
+                @click="save"
+              >
+                Save
+              </v-btn>
+              <v-btn v-else color="blue darken-1" text @click="editar">
+                Editar
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
             <v-card-title class="text-h5"
-              >Are you sure you want to delete this item?</v-card-title
+              >Estas seguro de borrar?</v-card-title
             >
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeDelete"
-                >Cancel</v-btn
+                >Cancelar</v-btn
               >
               <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                >OK</v-btn
+                >Confirmar</v-btn
               >
               <v-spacer></v-spacer>
             </v-card-actions>
@@ -127,10 +115,15 @@
 </template>
   
   <script>
+import axios from "axios";
+export const RUTA_SERVIDOR = process.env.VUE_APP_RUTA_API;
 export default {
   data: () => ({
+    search: null,
+    search1: null,
     dialog: false,
     dialogDelete: false,
+    items1: false,
     headers: [
       {
         text: "LOGIN",
@@ -139,27 +132,25 @@ export default {
         value: "login",
       },
       { text: "CLAVE", value: "clave" },
-      { text: "CATEGORIA DE PERSONAL", value: "cat_per" },
-      { text: "NOMBRE", value: "nomb_per" },
-      { text: "APELLIDO", value: "apellido_per" },
+      { text: "NOMBRE", value: "nomb" },
+      { text: "APELLIDO", value: "apellido" },
       { text: "PERFIL", value: "perfil" },
+      { text: "Actions", value: "actions", sortable: false },
     ],
     desserts: [],
     editedIndex: -1,
     editedItem: {
       login: "",
       clave: "",
-      cat_perac: "",
-      nomb_per: "",
-      apellido_per: "",
+      nomb: "",
+      apellido: "",
       perfil: "",
     },
     defaultItem: {
       login: "",
       clave: "",
-      cat_perac: "",
-      nomb_per: "",
-      apellido_per: "",
+      nomb: "",
+      apellido: "",
       perfil: "",
     },
   }),
@@ -181,82 +172,42 @@ export default {
 
   created() {
     this.initialize();
+    axios
+      .post(RUTA_SERVIDOR + "/api/token/", {
+        username: "admin",
+        password: "admin",
+      })
+      .then((response) => {
+        this.auth = "Bearer " + response.data.access;
+        axios
+          .get(RUTA_SERVIDOR + "usuario/", {
+            headers: { Authorization: this.auth },
+          })
+          .then((res) => {
+            console.log("exito listar usuario", res.data);
+            this.desserts = res.data;
+            this.dialogProg = false;
+          })
+          .catch((res) => {
+            console.log("Error:", res);
+          });
+      })
+      .catch((response) => {
+        response === 404
+          ? console.warn("lo sientimos no tenemos servicios")
+          : console.warn("Error:", response);
+      });
   },
 
   methods: {
     initialize() {
       this.desserts = [
         {
-          nomb_pac: "",
-          apell_pac: "",
-          direcc_pac: "",
-          cel_pac: 0,
-          docu_pac: 0,
-          fecha_nac_pac: 0,
-          sexo_pac: "",
-        },
-        {
-          name: "Ice cream sandwich",
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-        },
-        {
-          name: "Eclair",
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-        },
-        {
-          name: "Cupcake",
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-        },
-        {
-          name: "Gingerbread",
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-        },
-        {
-          name: "Jelly bean",
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-        },
-        {
-          name: "Lollipop",
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-        },
-        {
-          name: "Honeycomb",
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-        },
-        {
-          name: "Donut",
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-        },
-        {
-          name: "KitKat",
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
+          login: "",
+          clave: "",
+          nomb: "",
+          apellido: "",
+          perfil: "",
         },
       ];
     },
@@ -275,7 +226,36 @@ export default {
 
     deleteItemConfirm() {
       this.desserts.splice(this.editedIndex, 1);
-      this.closeDelete();
+      axios
+        .post(RUTA_SERVIDOR + "/api/token/", {
+          username: "admin",
+          password: "admin",
+        })
+        .then((response) => {
+          this.auth = "Bearer " + response.data.access;
+          axios
+            .delete(
+              RUTA_SERVIDOR +
+                "/usuario/" +
+                this.editedItem.url.split("/")[4] +
+                "/",
+              {
+                headers: { Authorization: this.auth },
+              }
+            )
+            .then((res) => {
+              console.log("eliminado exitoso", res);
+              this.closeDelete();
+            })
+            .catch((res) => {
+              console.warn("Error:", res);
+            });
+        })
+        .catch((response) => {
+          response === 404
+            ? console.warn("lo sientimos no tenemos servicios")
+            : console.warn("Error:", response);
+        });
     },
 
     close() {
@@ -294,13 +274,90 @@ export default {
       });
     },
 
+    editar() {
+      axios
+        .post(RUTA_SERVIDOR + "/api/token/", {
+          username: "admin",
+          password: "admin",
+        })
+        .then((response) => {
+          this.auth = "Bearer " + response.data.access;
+          axios
+            .patch(
+              RUTA_SERVIDOR +
+                "/usuario/" +
+                this.editedItem.url.split("/")[4] +
+                "/",
+              {
+                login: this.editedItem.login,
+                clave: this.editedItem.clave,
+                nomb: this.editedItem.nomb,
+                apellido: this.editedItem.apellido,
+                perfil: this.editedItem.perfil,
+              },
+              {
+                headers: { Authorization: this.auth },
+              }
+            )
+            .then((res) => {
+              console.log("yata exitoso", res);
+              this.close();
+            })
+            .catch((res) => {
+              console.warn("Error:", res);
+            });
+        })
+        .catch((response) => {
+          response === 404
+            ? console.warn("lo sientimos no tenemos servicios")
+            : console.warn("Error:", response);
+        });
+    },
+
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.desserts[this.editedIndex], this.editedItem);
       } else {
         this.desserts.push(this.editedItem);
+        //this.desserts.unshift(this.editedItem);
       }
-      this.close();
+      //this.close();
+      //console.log("algo", this.desserts);
+      console.log("algo2", this.editedItem);
+      axios
+        .post(RUTA_SERVIDOR + "/api/token/", {
+          username: "admin",
+          password: "admin",
+        })
+        .then((response) => {
+          this.auth = "Bearer " + response.data.access;
+          axios
+            .post(
+              RUTA_SERVIDOR + "/usuario/",
+              {
+                login: this.editedItem.login,
+                clave: this.editedItem.clave,
+                nomb: this.editedItem.nomb,
+                apellido: this.editedItem.apellido,
+                perfil: this.editedItem.perfil,
+              },
+              {
+                headers: { Authorization: this.auth },
+              }
+            )
+            .then((res) => {
+              console.log("exito", res.status);
+              this.close();
+            })
+            .catch((res) => {
+              console.log("Error:", res);
+            });
+        })
+        .catch((response) => {
+          response === 404
+            ? console.warn("lo sientimos no tenemos servicios")
+            : console.warn("Error:", response);
+        });
     },
   },
 };

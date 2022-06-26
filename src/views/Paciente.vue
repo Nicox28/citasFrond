@@ -3,7 +3,7 @@
     <v-dialog v-model="dialogProg" hide-overlay persistent width="300">
       <v-card color="primary" dark>
         <v-card-text>
-          Espere Unos Segundos
+          Espere Unos Minutos
           <v-progress-linear
             indeterminate
             color="white"
@@ -55,7 +55,7 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.apell_pac"
+                        v-model="editedItem.apellido_pac"
                         label="APELLIDOS"
                       ></v-text-field>
                     </v-col>
@@ -134,7 +134,17 @@
                 <v-btn color="blue darken-1" text @click="close">
                   Cancel
                 </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+                <v-btn
+                  v-if="editedIndex === -1"
+                  color="blue darken-1"
+                  text
+                  @click="save"
+                >
+                  Save
+                </v-btn>
+                <v-btn v-else color="blue darken-1" text @click="editar">
+                  Editar
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -168,7 +178,7 @@
   </div>
 </template>
   
-  <script>
+<script>
 import axios from "axios";
 export const RUTA_SERVIDOR = process.env.VUE_APP_RUTA_API;
 export default {
@@ -182,7 +192,7 @@ export default {
     dialog: false,
     search: "",
     dialogDelete: false,
-    dialogProg:false,
+    dialogProg: false,
     headers: [
       {
         text: "NOMBRE",
@@ -202,7 +212,7 @@ export default {
     editedIndex: -1,
     editedItem: {
       nomb_pac: "",
-      apell_pac: "",
+      apellido_pac: "",
       direcc_pac: "",
       cel_pac: "",
       docu_pac: "",
@@ -211,7 +221,7 @@ export default {
     },
     defaultItem: {
       nomb_pac: "",
-      apell_pac: "",
+      apellido_pac: "",
       direcc_pac: "",
       cel_pac: "",
       docu_pac: "",
@@ -237,7 +247,7 @@ export default {
 
   created() {
     this.initialize();
-    this.dialogProg=true;
+    this.dialogProg = true;
     axios
       .post(RUTA_SERVIDOR + "/api/token/", {
         username: "admin",
@@ -252,7 +262,7 @@ export default {
           .then((res) => {
             console.log("exito listar paciente", res.data);
             this.desserts = res.data;
-            this.dialogProg=false;
+            this.dialogProg = false;
           })
           .catch((res) => {
             console.log("Error:", res);
@@ -269,21 +279,51 @@ export default {
     initialize() {
       this.desserts = [
         {
-          nomb_pac: " ",
-          apell_pac: " ",
-          direcc_pac: " ",
-          cel_pac: " ",
-          docu_pac: " ",
-          fecha_nac_pac: " ",
-          sexo_pac: " ",
+          nomb_pac: "",
+          apellido_pac: "",
+          direcc_pac: "",
+          cel_pac: "",
+          docu_pac: "",
+          fecha_nac_pac: "",
+          sexo_pac: "",
         },
       ];
+    },
+
+    listaPacinte(){
+       this.dialogProg = true;
+    axios
+      .post(RUTA_SERVIDOR + "/api/token/", {
+        username: "admin",
+        password: "admin",
+      })
+      .then((response) => {
+        this.auth = "Bearer " + response.data.access;
+        axios
+          .get(RUTA_SERVIDOR + "paciente/", {
+            headers: { Authorization: this.auth },
+          })
+          .then((res) => {
+            console.log("exito listar paciente", res.data);
+            this.desserts = res.data;
+            this.dialogProg = false;
+          })
+          .catch((res) => {
+            console.log("Error:", res);
+          });
+      })
+      .catch((response) => {
+        response === 404
+          ? console.warn("lo sientimos no tenemos servicios")
+          : console.warn("Error:", response);
+      });
     },
 
     editItem(item) {
       this.editedIndex = this.desserts.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+      console.log("valorItem", this.editedItem.url.split("/")[4]);
     },
 
     deleteItem(item) {
@@ -294,7 +334,36 @@ export default {
 
     deleteItemConfirm() {
       this.desserts.splice(this.editedIndex, 1);
-      this.closeDelete();
+      axios
+        .post(RUTA_SERVIDOR + "/api/token/", {
+          username: "admin",
+          password: "admin",
+        })
+        .then((response) => {
+          this.auth = "Bearer " + response.data.access;
+          axios
+            .delete(
+              RUTA_SERVIDOR +
+                "/paciente/" +
+                this.editedItem.url.split("/")[4] +
+                "/",
+              {
+                headers: { Authorization: this.auth },
+              }
+            )
+            .then((res) => {
+              console.log("eliminado exitoso", res);
+              this.closeDelete();
+            })
+            .catch((res) => {
+              console.warn("Error:", res);
+            });
+        })
+        .catch((response) => {
+          response === 404
+            ? console.warn("lo sientimos no tenemos servicios")
+            : console.warn("Error:", response);
+        });
     },
 
     close() {
@@ -312,16 +381,57 @@ export default {
         this.editedIndex = -1;
       });
     },
-
+    editar() {
+      axios
+        .post(RUTA_SERVIDOR + "/api/token/", {
+          username: "admin",
+          password: "admin",
+        })
+        .then((response) => {
+          this.auth = "Bearer " + response.data.access;
+          axios
+            .patch(
+              RUTA_SERVIDOR +
+                "/paciente/" +
+                this.editedItem.url.split("/")[4] +
+                "/",
+              {
+                nomb_pac: this.editedItem.nomb_pac,
+                apellido_pac: this.editedItem.apellido_pac,
+                direcc_pac: this.editedItem.direcc_pac,
+                cel_pac: this.editedItem.cel_pac,
+                docu_pac: this.editedItem.docu_pac,
+                fecha_nac_pac: this.editedItem.fecha_nac_pac,
+                sexo_pac: this.editedItem.sexo_pac,
+              },
+              {
+                headers: { Authorization: this.auth },
+              }
+            )
+            .then((res) => {
+              console.log("yata exitoso", res);
+              this.close();
+            })
+            .catch((res) => {
+              console.warn("Error:", res);
+            });
+        })
+        .catch((response) => {
+          response === 404
+            ? console.warn("lo sientimos no tenemos servicios")
+            : console.warn("Error:", response);
+        });
+    },
     save() {
-      if (this.editedIndex > -1) {
+      /*if (this.editedIndex > -1) {
         Object.assign(this.desserts[this.editedIndex], this.editedItem);
       } else {
         this.desserts.push(this.editedItem);
+        //this.desserts.unshift(this.editedItem);
       }
       //this.close();
       //console.log("algo", this.desserts);
-      console.log("algo2", this.editedItem);
+      console.log("algo2", this.editedItem);*/
 
       axios
         .post(RUTA_SERVIDOR + "/api/token/", {
@@ -335,7 +445,7 @@ export default {
               RUTA_SERVIDOR + "/paciente/",
               {
                 nomb_pac: this.editedItem.nomb_pac,
-                apellido_pac: this.editedItem.apell_pac,
+                apellido_pac: this.editedItem.apellido_pac,
                 direcc_pac: this.editedItem.direcc_pac,
                 cel_pac: this.editedItem.cel_pac,
                 docu_pac: this.editedItem.docu_pac,
@@ -348,6 +458,7 @@ export default {
             )
             .then((res) => {
               console.log("exito", res.status);
+              this.listaPacinte();
               this.close();
             })
             .catch((res) => {

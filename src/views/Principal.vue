@@ -37,9 +37,9 @@
                 </v-list-item>
                 <v-list-item link>
                   <v-list-item-content>
-                    <v-list-item-title class="text-h6">
-                      John Leider - {{ selectedItem }}
-                    </v-list-item-title>
+                    <v-list-item-subtitle
+                      > {{nombre}}</v-list-item-subtitle
+                    >
                     <v-list-item-subtitle
                       >john@vuetifyjs.com</v-list-item-subtitle
                     >
@@ -53,14 +53,83 @@
               <v-divider></v-divider>
               <v-list nav dense>
                 <v-list-item-group v-model="selectedItem" color="primary">
-                  <v-list-item v-for="(item, i) in items" :key="i">
+                  <v-list-item v-if="perfil == 1 || perfil == 0">
                     <v-list-item-icon>
-                      <v-icon v-text="item.icon"></v-icon>
+                      <v-icon v-text="items[0].icon"></v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
-                      <v-list-item-title v-text="item.text"></v-list-item-title>
+                      <v-list-item-title
+                        v-text="items[0].text"
+                      ></v-list-item-title>
                     </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item v-if="perfil == 0">
+                    <v-list-item-icon>
+                      <v-icon v-text="items[1].icon"></v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-text="items[1].text"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item v-if="perfil == 1 || perfil == 0">
+                    <v-list-item-icon>
+                      <v-icon v-text="items[2].icon"></v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-text="items[2].text"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item v-if="perfil == 0 || perfil == 1 || perfil == 2">
+                    <v-list-item-icon>
+                      <v-icon v-text="items[3].icon"></v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-text="items[3].text"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item v-if="perfil == 0">
+                    <v-list-item-icon>
+                      <v-icon v-text="items[4].icon"></v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-text="items[4].text"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item v-if="perfil == 1 || perfil == 0">
+                    <v-list-item-icon>
+                      <v-icon v-text="items[5].icon"></v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-text="items[5].text"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-btn
+                      depressed
+                      elevation="2"
+                      outlined
+                      plain
+                      raised
+                      @click="salir"
+                    >SALIR</v-btn>
                   </v-list-item>
                 </v-list-item-group>
               </v-list>
@@ -68,12 +137,23 @@
           </v-card>
         </div>
         <div class="col-sm-10">
-          <div v-if="selectedItem == 0"><Paciente /></div>
-          <div v-if="selectedItem == 1"><Personal /></div>
-          <div v-if="selectedItem == 2"><Especialidad /></div>
-          <div v-if="selectedItem == 3"><Citas /></div>
+          <div v-if="selectedItem == 0 && perfil == 0"><Paciente /></div>
+          <div v-if="selectedItem == 1 && perfil == 0"><Personal /></div>
+          <div v-if="selectedItem == 2 && perfil == 0"><Especialidad /></div>
+          <div v-if="selectedItem == 3 && perfil == 0"><Citas /></div>
+          <div v-if="selectedItem == 4 && perfil == 0"><Usuarios /></div>
+          <div v-if="selectedItem == 5 && perfil == 0"><Tratamientos /></div>
+
+          <div v-if="selectedItem == 0 && perfil == 1"><Paciente /></div>
+          <div v-if="selectedItem == 1 && perfil == 1"><Especialidad /></div>
+          <div v-if="selectedItem == 2 && perfil == 1"><Citas /></div>
+          <div v-if="selectedItem == 3 && perfil == 1"><Tratamientos /></div>
+
+          <div v-if="selectedItem == 0 && perfil == 2"><Citas /></div>
+
           <div v-if="selectedItem == 4"><Usuarios /></div>
-          <div v-if="selectedItem == 5"><Tratamiento /></div>
+
+          <div v-if="selectedItem == 5"><Tratamientos /></div>
         </div>
       </div>
     </v-sheet>
@@ -87,11 +167,14 @@ import Personal from "./Personal.vue";
 import Especialidad from "./Especialidad.vue";
 import Citas from "./Cita.vue";
 import Usuarios from "./Usuario.vue";
-import Tratamiento from "./Tratamiento.vue";
+import Tratamientos from "./Tratamiento.vue";
 
 export default {
   data: () => ({
+    dialog: false,
     drawer: true,
+    perfil: "",
+    nombre: "",
     selectedItem: 0,
     items: [
       { text: "Pacientes", icon: "mdi-account-supervisor-circle" },
@@ -99,7 +182,7 @@ export default {
       { text: "Especialidad", icon: "mdi-inbox-full-outline" },
       { text: "Citas", icon: "mdi-calendar-month-outline" },
       { text: "Usuarios", icon: "mdi-account-supervisor-circle" },
-      { text: "Tratamiento", icon: "mdi-air-filter" },
+      { text: "Tratamientos", icon: "mdi-air-filter" },
       { text: "Salir", icon: "mdi-exit-run" },
     ],
     mini: false,
@@ -116,7 +199,16 @@ export default {
     ],
   }),
 
-  methods: {},
+  methods: {
+    salir(){
+      this.$router.push("/");
+    }
+  },
+
+  created() {
+    this.perfil = sessionStorage.getItem("perfil");
+    this.nombre = sessionStorage.getItem("nombre");
+  },
 
   components: {
     Paciente,
@@ -124,7 +216,7 @@ export default {
     Especialidad,
     Citas,
     Usuarios,
-    Tratamiento,
+    Tratamientos,
   },
 };
 </script>

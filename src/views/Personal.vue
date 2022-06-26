@@ -1,5 +1,17 @@
 <template>
   <div>
+    <v-dialog v-model="dialogProg" hide-overlay persistent width="300">
+      <v-card color="primary" dark>
+        <v-card-text>
+          Espere Unos Minutos
+          <v-progress-linear
+            indeterminate
+            color="white"
+            class="mb-0"
+          ></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <v-data-table
       :headers="headers"
       :items="desserts"
@@ -62,49 +74,23 @@
                       ></v-text-field>
                     </v-col>
                     <v-combobox
+                      dense
+                      filled
+                      outlined
+                      solo
                       v-model="editedItem.especialidad"
                       :items="itemsCombo"
-                      :search-input.sync="search"
-                      hide-selected
-                      hint="Maximum of 7 tags"
-                      label="ESPECIALIDAD"
-                      multiple
-                      persistent-hint
-                      small-chips
-                    >
-                      <template v-slot:no-data>
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              No results matching "<strong>{{ search }}</strong
-                              >". Press <kbd>enter</kbd> to create a new one
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                      </template>
-                    </v-combobox>
+                      label="especialidad"
+                    ></v-combobox>
                     <v-combobox
+                      dense
+                      filled
+                      outlined
+                      solo
                       v-model="editedItem.cat_per"
                       :items="items1"
-                      :search-input.sync="search1"
-                      hide-selected
-                      hint="Maximum of 5 tags"
-                      label="CATEGORIA DE PERSONAL"
-                      multiple
-                      persistent-hint
-                      small-chips
-                    >
-                      <template v-slot:no-data>
-                        <v-list-item>
-                          <v-list-item-content>
-                            <v-list-item-title>
-                              No results matching "<strong>{{ search }}</strong
-                              >". Press <kbd>enter</kbd> to create a new one
-                            </v-list-item-title>
-                          </v-list-item-content>
-                        </v-list-item>
-                      </template>
-                    </v-combobox>
+                      label="categoria"
+                    ></v-combobox>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.sexo_per"
@@ -120,7 +106,17 @@
                 <v-btn color="blue darken-1" text @click="close">
                   Cancel
                 </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+                <v-btn
+                  v-if="editedIndex === -1"
+                  color="blue darken-1"
+                  text
+                  @click="save"
+                >
+                  Save
+                </v-btn>
+                <v-btn v-else color="blue darken-1" text @click="editar">
+                  Editar
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -161,17 +157,15 @@ export default {
   data: () => ({
     itemsCombo: [],
     model: ["editedItem.especialidad"],
-    search: null,
+    search: "",
     dialog: false,
 
-    items1: ["Administrador", "Recpecionista", "Odontologo"],
+    items1: [],
     model1: ["editedItem.cat_per"],
-    search1: null,
+    search1: "",
     dialog1: false,
-
-    dialogProg: false,
-
     dialogDelete: false,
+    dialogProg: false,
     headers: [
       {
         text: "NOMBRE",
@@ -179,7 +173,7 @@ export default {
         sortable: false,
         value: "nomb_per",
       },
-      { text: "APELLIDO", value: "apell_per" },
+      { text: "APELLIDO", value: "apellido_per" },
       { text: "CELULAR", value: "cel_per" },
       { text: "DOCUMENTO IDENTIDAD", value: "docu_per" },
       { text: "ESPECIALIDAD", value: "especialidad" },
@@ -191,7 +185,7 @@ export default {
     editedIndex: -1,
     editedItem: {
       nomb_per: "",
-      apell_per: "",
+      apellido_per: "",
       cel_per: "",
       docu_per: "",
       especialidad: "",
@@ -200,7 +194,7 @@ export default {
     },
     defaultItem: {
       nomb_per: "",
-      apell_per: "",
+      apellido_per: "",
       cel_per: "",
       docu_per: "",
       especialidad: "",
@@ -231,6 +225,40 @@ export default {
 
   created() {
     this.initialize();
+    this.dialogProg = true;
+
+    axios
+      .post(RUTA_SERVIDOR + "/api/token/", {
+        username: "admin",
+        password: "admin",
+      })
+      .then((response) => {
+        this.auth = "Bearer " + response.data.access;
+        axios
+          .get(RUTA_SERVIDOR + "personal/", {
+            headers: { Authorization: this.auth },
+          })
+          .then((res) => {
+            console.log("exito listar personal", res.data);
+            this.desserts = res.data;
+            this.dialogProg = false;
+            for (let i = 0; i < res.data.length; i++) {
+              this.itemsCombo.push(res.data[i].nomb_espe);
+            }
+            for (let i = 0; i < res.data.length; i++) {
+              this.items1.push(res.data[i].nomb_cat_per);
+            }
+          })
+          .catch((res) => {
+            console.log("Error:", res);
+          });
+      })
+      .catch((response) => {
+        response === 404
+          ? console.warn("lo sientimos no tenemos servicios")
+          : console.warn("Error:", response);
+      });
+
     axios
       .post(RUTA_SERVIDOR + "/api/token/", {
         username: "admin",
@@ -257,6 +285,32 @@ export default {
           ? console.warn("lo sientimos no tenemos servicios")
           : console.warn("Error:", response);
       });
+    axios
+      .post(RUTA_SERVIDOR + "/api/token/", {
+        username: "admin",
+        password: "admin",
+      })
+      .then((response) => {
+        this.auth = "Bearer " + response.data.access;
+        axios
+          .get(RUTA_SERVIDOR + "cat_per/", {
+            headers: { Authorization: this.auth },
+          })
+          .then((res) => {
+            console.log("lista de categorias", res.data);
+            for (let i = 0; i < res.data.length; i++) {
+              this.items1.push(res.data[i].nomb_cat_per);
+            }
+          })
+          .catch((res) => {
+            console.log("Error:", res);
+          });
+      })
+      .catch((response) => {
+        response === 404
+          ? console.warn("lo sientimos no tenemos servicios")
+          : console.warn("Error:", response);
+      });
   },
 
   methods: {
@@ -264,7 +318,7 @@ export default {
       this.desserts = [
         {
           nomb_per: "",
-          apell_per: "",
+          apellido_per: "",
           cel_per: "",
           docu_per: "",
           especialidad: "",
@@ -272,6 +326,36 @@ export default {
           sexo_per: "",
         },
       ];
+    },
+
+    listaPersonal(){
+       this.dialogProg = true;
+    axios
+      .post(RUTA_SERVIDOR + "/api/token/", {
+        username: "admin",
+        password: "admin",
+      })
+      .then((response) => {
+        this.auth = "Bearer " + response.data.access;
+        axios
+          .get(RUTA_SERVIDOR + "personal/", {
+            headers: { Authorization: this.auth },
+          })
+          .then((res) => {
+            console.log("exito listar personal", res.data);
+            this.desserts = res.data;
+            this.dialogProg = false;
+            this.close();
+          })
+          .catch((res) => {
+            console.log("Error:", res);
+          });
+      })
+      .catch((response) => {
+        response === 404
+          ? console.warn("lo sientimos no tenemos servicios")
+          : console.warn("Error:", response);
+      });
     },
 
     editItem(item) {
@@ -288,7 +372,36 @@ export default {
 
     deleteItemConfirm() {
       this.desserts.splice(this.editedIndex, 1);
-      this.closeDelete();
+      axios
+        .post(RUTA_SERVIDOR + "/api/token/", {
+          username: "admin",
+          password: "admin",
+        })
+        .then((response) => {
+          this.auth = "Bearer " + response.data.access;
+          axios
+            .delete(
+              RUTA_SERVIDOR +
+                "/personal/" +
+                this.editedItem.url.split("/")[4] +
+                "/",
+              {
+                headers: { Authorization: this.auth },
+              }
+            )
+            .then((res) => {
+              console.log("eliminado exitoso", res);
+              this.closeDelete();
+            })
+            .catch((res) => {
+              console.warn("Error:", res);
+            });
+        })
+        .catch((response) => {
+          response === 404
+            ? console.warn("lo sientimos no tenemos servicios")
+            : console.warn("Error:", response);
+        });
     },
 
     close() {
@@ -307,15 +420,57 @@ export default {
       });
     },
 
+    editar() {
+      axios
+        .post(RUTA_SERVIDOR + "/api/token/", {
+          username: "admin",
+          password: "admin",
+        })
+        .then((response) => {
+          this.auth = "Bearer " + response.data.access;
+          axios
+            .patch(
+              RUTA_SERVIDOR +
+                "/personal/" +
+                this.editedItem.url.split("/")[4] +
+                "/",
+              {
+                nomb_per: this.editedItem.nomb_per,
+                apellido_per: this.editedItem.apellido_per,
+                cel_per: this.editedItem.cel_per,
+                docu_per: this.editedItem.docu_per,
+                especialidad: this.editedItem.especialidad,
+                cat_per: this.editedItem.cat_per,
+                sexo_per: this.editedItem.sexo_per,
+              },
+              {
+                headers: { Authorization: this.auth },
+              }
+            )
+            .then((res) => {
+              console.log("Es exitoso", res);
+              this.close();
+            })
+            .catch((res) => {
+              console.warn("Error:", res);
+            });
+        })
+        .catch((response) => {
+          response === 404
+            ? console.warn("lo sientimos no tenemos servicios")
+            : console.warn("Error:", response);
+        });
+    },
+
     save() {
-      if (this.editedIndex > -1) {
+      /*if (this.editedIndex > -1) {
         Object.assign(this.desserts[this.editedIndex], this.editedItem);
       } else {
         this.desserts.push(this.editedItem);
       }
       //this.close();
       //console.log("algo", this.desserts);
-      console.log("algo2", this.editedItem);
+      console.log("algo2", this.editedItem);*/
 
       axios
         .post(RUTA_SERVIDOR + "/api/token/", {
@@ -326,12 +481,12 @@ export default {
           this.auth = "Bearer " + response.data.access;
           axios
             .post(
-              RUTA_SERVIDOR + "/personal/",
+              RUTA_SERVIDOR + "personal/",
               {
-                nomb_pac: this.editedItem.nomb_per,
-                apellido_pac: this.editedItem.nomb_per,
-                cel_pac: this.editedItem.cel_per,
-                docu_pac: this.editedItem.docu_per,
+                nomb_per: this.editedItem.nomb_per,
+                apellido_per: this.editedItem.apellido_per,
+                cel_per: this.editedItem.cel_per,
+                docu_per: this.editedItem.docu_per,
                 especialidad: this.editedItem.especialidad,
                 cat_per: this.editedItem.cat_per,
                 sexo_per: this.editedItem.sexo_per,
@@ -342,6 +497,7 @@ export default {
             )
             .then((res) => {
               console.log("exito", res.status);
+              this.listaPersonal();
               this.close();
             })
             .catch((res) => {
