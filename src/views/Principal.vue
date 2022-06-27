@@ -151,9 +151,6 @@
 
           <div v-if="selectedItem == 0 && perfil == 2"><Citas /></div>
 
-          <div v-if="selectedItem == 4"><Usuarios /></div>
-
-          <div v-if="selectedItem == 5"><Tratamientos /></div>
         </div>
       </div>
     </v-sheet>

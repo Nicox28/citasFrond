@@ -21,7 +21,7 @@
     >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Usuario</v-toolbar-title>
+          <v-toolbar-title>Personal</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-text-field
@@ -36,7 +36,7 @@
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-                Nuevo Usuario
+                Nueva Cita
               </v-btn>
             </template>
             <v-card>
@@ -49,32 +49,46 @@
                   <v-row>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.login"
-                        label="LOGIN"
-                      ></v-text-field>
+                        type="time"
+                        label="Agregar Hora"
+                        v-model="editedItem.hora"
+                      >
+                      </v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <template v-slot:activator="{ on, attrs }">
                       <v-text-field
-                        v-model="editedItem.clave"
-                        label="CLAVE"
+                        v-model="editedItem.fecha"
+                        label="Calendar"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
                       ></v-text-field>
-                    </v-col>
+                    </template>
                     <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.nomb"
+                      <v-combobox
+                        dense
+                        filled
+                        outlined
+                        solo
+                        v-model="editedItem.nomb_pac"
+                        :items="items1"
                         label="NOMBRE"
-                      ></v-text-field>
+                      ></v-combobox>
+                      <v-combobox
+                        dense
+                        filled
+                        outlined
+                        solo
+                        v-model="editedItem.apellido_pac"
+                        :items="itemsCombo"
+                        label="APELLIDO"
+                      ></v-combobox>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.apellido"
-                        label="APELLIDOS"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.perfil"
-                        label="PERFIL"
+                        v-model="editedItem.correo"
+                        label="CORREO"
                       ></v-text-field>
                     </v-col>
                   </v-row>
@@ -103,15 +117,15 @@
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
               <v-card-title class="text-h5"
-                >Estas seguro de borrar?</v-card-title
+                >Are you sure you want to delete this item?</v-card-title
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeDelete"
-                  >Cancelar</v-btn
+                  >Cancel</v-btn
                 >
                 <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                  >Confirmar</v-btn
+                  >OK</v-btn
                 >
                 <v-spacer></v-spacer>
               </v-card-actions>
@@ -135,45 +149,56 @@ import axios from "axios";
 export const RUTA_SERVIDOR = process.env.VUE_APP_RUTA_API;
 export default {
   data: () => ({
+    date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+      .toISOString()
+      .substr(0, 10),
+    itemsCombo: [],
+    model: ["editedItem.paciente"],
     search: "",
-    search1: "",
     dialog: false,
+
+    items1: [],
+    model1: ["editedItem.paciente"],
+    search1: "",
+    dialog1: false,
     dialogDelete: false,
     dialogProg: false,
     headers: [
       {
-        text: "LOGIN",
+        text: "HORA",
         align: "start",
         sortable: false,
-        value: "login",
+        value: "hora",
       },
-      { text: "CLAVE", value: "clave" },
-      { text: "NOMBRE", value: "nomb" },
-      { text: "APELLIDO", value: "apellido" },
-      { text: "PERFIL", value: "perfil" },
+      { text: "FECHA", value: "fecha" },
+      { text: "NOMBRE", value: "nomb_pac" },
+      { text: "APELLIDO", value: "apellido_pac" },
+      { text: "CORREO", value: "correo" },
       { text: "Actions", value: "actions", sortable: false },
     ],
     desserts: [],
     editedIndex: -1,
     editedItem: {
-      login: "",
-      clave: "",
-      nomb: "",
-      apellido: "",
-      perfil: "",
+      hora: "",
+      fecha: "",
+      nomb_pac: "",
+      docu_per: "",
+      apellido_pac: "",
+      correo: "",
     },
     defaultItem: {
-      login: "",
-      clave: "",
-      nomb: "",
-      apellido: "",
-      perfil: "",
+      hora: "",
+      fecha: "",
+      nomb_pac: "",
+      docu_per: "",
+      apellido_pac: "",
+      correo: "",
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "NUEVO USUARIO" : "Edit Item";
+      return this.editedIndex === -1 ? "NUEVO PERSONAL" : "Edit Item";
     },
   },
 
@@ -194,6 +219,7 @@ export default {
   created() {
     this.initialize();
     this.dialogProg = true;
+
     axios
       .post(RUTA_SERVIDOR + "/api/token/", {
         username: "admin",
@@ -202,13 +228,72 @@ export default {
       .then((response) => {
         this.auth = "Bearer " + response.data.access;
         axios
-          .get(RUTA_SERVIDOR + "usuario/", {
+          .get(RUTA_SERVIDOR + "paciente/", {
             headers: { Authorization: this.auth },
           })
           .then((res) => {
-            console.log("exito listar usuario", res.data);
+            console.log("exito listar cita", res.data);
             this.desserts = res.data;
             this.dialogProg = false;
+            for (let i = 0; i < res.data.length; i++) {
+              this.itemsCombo.push(res.data[i].apellido_pac);
+            }
+            for (let i = 0; i < res.data.length; i++) {
+              this.items1.push(res.data[i].nomb_pac);
+            }
+          })
+          .catch((res) => {
+            console.log("Error:", res);
+          });
+      })
+      .catch((response) => {
+        response === 404
+          ? console.warn("lo sientimos no tenemos servicios")
+          : console.warn("Error:", response);
+      });
+
+    axios
+      .post(RUTA_SERVIDOR + "/api/token/", {
+        username: "admin",
+        password: "admin",
+      })
+      .then((response) => {
+        this.auth = "Bearer " + response.data.access;
+        axios
+          .get(RUTA_SERVIDOR + "paciente/", {
+            headers: { Authorization: this.auth },
+          })
+          .then((res) => {
+            console.log("lista de pacientes", res.data);
+            for (let i = 0; i < res.data.length; i++) {
+              this.itemsCombo.push(res.data[i].apellido_pac);
+            }
+          })
+          .catch((res) => {
+            console.log("Error:", res);
+          });
+      })
+      .catch((response) => {
+        response === 404
+          ? console.warn("lo sientimos no tenemos servicios")
+          : console.warn("Error:", response);
+      });
+    axios
+      .post(RUTA_SERVIDOR + "/api/token/", {
+        username: "admin",
+        password: "admin",
+      })
+      .then((response) => {
+        this.auth = "Bearer " + response.data.access;
+        axios
+          .get(RUTA_SERVIDOR + "paciente/", {
+            headers: { Authorization: this.auth },
+          })
+          .then((res) => {
+            console.log("lista de categorias", res.data);
+            for (let i = 0; i < res.data.length; i++) {
+              this.items1.push(res.data[i].nomb_pac);
+            }
           })
           .catch((res) => {
             console.log("Error:", res);
@@ -225,43 +310,44 @@ export default {
     initialize() {
       this.desserts = [
         {
-          login: "",
-          clave: "",
-          nomb: "",
-          apellido: "",
-          perfil: "",
+          hora: "",
+          fecha: "",
+          nomb_pac: "",
+          docu_per: "",
+          apellido_pac: "",
+          correo: "",
         },
       ];
     },
 
-    listarUsuario(){
-       this.dialogProg = true;
-    axios
-      .post(RUTA_SERVIDOR + "/api/token/", {
-        username: "admin",
-        password: "admin",
-      })
-      .then((response) => {
-        this.auth = "Bearer " + response.data.access;
-        axios
-          .get(RUTA_SERVIDOR + "usuario/", {
-            headers: { Authorization: this.auth },
-          })
-          .then((res) => {
-            console.log("exito listar usuario", res.data);
-            this.desserts = res.data;
-            this.dialogProg = false;
-            this.close();
-          })
-          .catch((res) => {
-            console.log("Error:", res);
-          });
-      })
-      .catch((response) => {
-        response === 404
-          ? console.warn("lo sientimos no tenemos servicios")
-          : console.warn("Error:", response);
-      });
+    listaCita() {
+      this.dialogProg = true;
+      axios
+        .post(RUTA_SERVIDOR + "/api/token/", {
+          username: "admin",
+          password: "admin",
+        })
+        .then((response) => {
+          this.auth = "Bearer " + response.data.access;
+          axios
+            .get(RUTA_SERVIDOR + "cita/", {
+              headers: { Authorization: this.auth },
+            })
+            .then((res) => {
+              console.log("exito listar personal", res.data);
+              this.desserts = res.data;
+              this.dialogProg = false;
+              this.close();
+            })
+            .catch((res) => {
+              console.log("Error:", res);
+            });
+        })
+        .catch((response) => {
+          response === 404
+            ? console.warn("lo sientimos no tenemos servicios")
+            : console.warn("Error:", response);
+        });
     },
 
     editItem(item) {
@@ -288,7 +374,7 @@ export default {
           axios
             .delete(
               RUTA_SERVIDOR +
-                "/usuario/" +
+                "/cita/" +
                 this.editedItem.url.split("/")[4] +
                 "/",
               {
@@ -337,22 +423,22 @@ export default {
           axios
             .patch(
               RUTA_SERVIDOR +
-                "/usuario/" +
+                "/cita/" +
                 this.editedItem.url.split("/")[4] +
                 "/",
               {
-                login: this.editedItem.login,
-                clave: this.editedItem.clave,
-                nomb: this.editedItem.nomb,
-                apellido: this.editedItem.apellido,
-                perfil: this.editedItem.perfil,
+                hora: this.editedItem.hora,
+                fecha: this.editedItem.fecha,
+                nomb_pac: this.editedItem.nomb_pac,
+                apellido_pac: this.editedItem.apellido_pac,
+                correo: this.editedItem.correo,
               },
               {
                 headers: { Authorization: this.auth },
               }
             )
             .then((res) => {
-              console.log("yata exitoso", res);
+              console.log("Es exitoso", res);
               this.close();
             })
             .catch((res) => {
@@ -371,11 +457,11 @@ export default {
         Object.assign(this.desserts[this.editedIndex], this.editedItem);
       } else {
         this.desserts.push(this.editedItem);
-        //this.desserts.unshift(this.editedItem);
       }
       //this.close();
-      //console.log("algo", this.desserts);*/
-      /*console.log("algo2", this.editedItem);*/
+      //console.log("algo", this.desserts);
+      console.log("algo2", this.editedItem);*/
+
       axios
         .post(RUTA_SERVIDOR + "/api/token/", {
           username: "admin",
@@ -385,13 +471,13 @@ export default {
           this.auth = "Bearer " + response.data.access;
           axios
             .post(
-              RUTA_SERVIDOR + "/usuario/",
+              RUTA_SERVIDOR + "cita/",
               {
-                login: this.editedItem.login,
-                clave: this.editedItem.clave,
-                nomb: this.editedItem.nomb,
-                apellido: this.editedItem.apellido,
-                perfil: this.editedItem.perfil,
+                hora: this.editedItem.hora,
+                fecha: this.editedItem.fecha,
+                nomb_pac: this.editedItem.nomb_pac,
+                apellido_pac: this.editedItem.apellido_pac,
+                correo: this.editedItem.correo,
               },
               {
                 headers: { Authorization: this.auth },
@@ -399,7 +485,7 @@ export default {
             )
             .then((res) => {
               console.log("exito", res.status);
-              this.listarUsuario();
+              this.listaCita();
               this.close();
             })
             .catch((res) => {

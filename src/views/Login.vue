@@ -1,47 +1,41 @@
 <template>
-  <div class="d-flex flex-column justify-space-between align-center mt-5">
-    <v-form ref="form" v-model="valid" lazy-validation>
-      <template>
-        <v-card class="mx-auto" width="300" color="#BBDEFB" elevation="5">
-          MULTIDENT
-        </v-card>
-        <v-divider class="mx-4" inset vertical></v-divider>
+  <div>
+    <div class="d-flex flex-column justify-space-between align-center mt-5">
+      <v-form ref="form" v-model="valid" lazy-validation>
+        <template>
+          <v-card class="mx-auto" width="300" color="#BBDEFB" elevation="5">
+            MULTIDENT
+          </v-card>
+          <v-divider class="mx-4" inset vertical></v-divider>
 
-        <v-text-field
-          v-model="user"
-          :rules="nameRules"
-          label="Usuario"
-          required
-        ></v-text-field>
+          <v-text-field
+            v-model="user"
+            :rules="nameRules"
+            label="Usuario"
+            required
+          ></v-text-field>
 
-        <v-text-field
-          v-model="contra"
-          :rules="nameRules"
-          type="password"
-          label="Contraseña"
-          required
-        ></v-text-field>
+          <v-text-field
+            v-model="contra"
+            :rules="nameRules"
+            type="password"
+            label="Contraseña"
+            required
+          ></v-text-field>
 
-        <v-btn
-          :disabled="!valid"
-          color="success"
-          class="mr-4"
-          @click="ingresar"
-        >
-          Ingresar
-        </v-btn>
-        <v-btn
-          :disabled="!valid"
-          color="success"
-          class="mr-4"
-          @click="ingresar"
-        >
-          Cancelar
-        </v-btn>
-      </template>
-    </v-form>
+          <v-btn
+            :disabled="!valid"
+            color="success"
+            class="mr-4"
+            @click="ingresar"
+          >
+            Ingresar
+          </v-btn>
+          <v-alert color="red" type="error" :value="value">Contraseña Error</v-alert>
+        </template>
+      </v-form>
+    </div>
   </div>
-  
 </template>
 
 
@@ -54,6 +48,7 @@ export const RUTA_SERVIDOR = process.env.VUE_APP_RUTA_API;
 
 export default {
   data: () => ({
+    value: false,
     valid: true,
     user: "",
     nameRules: [
@@ -65,6 +60,12 @@ export default {
   }),
 
   methods: {
+    error(){
+this.value=true;
+    },
+    actualizar(){
+      this.value=false;
+    },
     ingresar() {
       this.$refs.form.validate();
       console.log("estamos aqui");
@@ -85,9 +86,13 @@ export default {
                 console.log("esto es un exito ya ingresaste");
                 this.$router.push("/principal");
                 sessionStorage.setItem("perfil", res.data[0].perfil);
-                sessionStorage.setItem("nombre", res.data[0].nomb + " " + res.data[0].apellido);
+                sessionStorage.setItem(
+                  "nombre",
+                  res.data[0].nomb + " " + res.data[0].apellido
+                );
               } else {
                 console.log("eres un impostor");
+                this.error()
               }
             })
             .catch((res) => {
