@@ -47,26 +47,26 @@
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.nomb_per"
                         label="NOMBRE"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.apellido_per"
                         label="APELLIDOS"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.cel_per"
                         label="CELULAR"
                         type="number"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.docu_per"
                         label="DOCUMENTO DE IDENTIDAD"
@@ -91,12 +91,16 @@
                       :items="items1"
                       label="categoria"
                     ></v-combobox>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.sexo_per"
-                        label="SEXO"
-                      ></v-text-field>
-                    </v-col>
+                    <v-combobox
+                      dense
+                      filled
+                      outlined
+                      solo
+                      v-model="editedItem.sexo_per"
+                      :items="items3"
+                      label="sexo"
+                    ></v-combobox>
+                    
                   </v-row>
                 </v-container>
               </v-card-text>
@@ -104,7 +108,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="close">
-                  Cancel
+                  Cancelar
                 </v-btn>
                 <v-btn
                   v-if="editedIndex === -1"
@@ -112,7 +116,7 @@
                   text
                   @click="save"
                 >
-                  Save
+                  Guardar
                 </v-btn>
                 <v-btn v-else color="blue darken-1" text @click="editar">
                   Editar
@@ -123,7 +127,7 @@
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
               <v-card-title class="text-h5"
-                >Are you sure you want to delete this item?</v-card-title
+                >Estas seguro de borrar al Personal?</v-card-title
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -159,6 +163,7 @@ export default {
     model: ["editedItem.especialidad"],
     search: "",
     dialog: false,
+    items3: ["Maculino","Femenino"],
 
     items1: [],
     model1: ["editedItem.cat_per"],
@@ -449,6 +454,7 @@ export default {
             )
             .then((res) => {
               console.log("Es exitoso", res);
+              this.listaPersonal()
               this.close();
             })
             .catch((res) => {

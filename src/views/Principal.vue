@@ -37,12 +37,7 @@
                 </v-list-item>
                 <v-list-item link>
                   <v-list-item-content>
-                    <v-list-item-subtitle
-                      > {{nombre}}</v-list-item-subtitle
-                    >
-                    <v-list-item-subtitle
-                      >john@vuetifyjs.com</v-list-item-subtitle
-                    >
+                    <v-list-item-subtitle> {{ nombre }}</v-list-item-subtitle>
                   </v-list-item-content>
 
                   <v-list-item-action>
@@ -121,6 +116,18 @@
                     </v-list-item-content>
                   </v-list-item>
 
+                  <v-list-item v-if="perfil == 0">
+                    <v-list-item-icon>
+                      <v-icon v-text="items[6].icon"></v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-text="items[6].text"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+
                   <v-list-item>
                     <v-btn
                       depressed
@@ -129,7 +136,8 @@
                       plain
                       raised
                       @click="salir"
-                    >SALIR</v-btn>
+                      >SALIR</v-btn
+                    >
                   </v-list-item>
                 </v-list-item-group>
               </v-list>
@@ -143,6 +151,7 @@
           <div v-if="selectedItem == 3 && perfil == 0"><Citas /></div>
           <div v-if="selectedItem == 4 && perfil == 0"><Usuarios /></div>
           <div v-if="selectedItem == 5 && perfil == 0"><Tratamientos /></div>
+          <div v-if="selectedItem == 6 && perfil == 0"><Consultorios /></div>
 
           <div v-if="selectedItem == 0 && perfil == 1"><Paciente /></div>
           <div v-if="selectedItem == 1 && perfil == 1"><Especialidad /></div>
@@ -150,7 +159,6 @@
           <div v-if="selectedItem == 3 && perfil == 1"><Tratamientos /></div>
 
           <div v-if="selectedItem == 0 && perfil == 2"><Citas /></div>
-
         </div>
       </div>
     </v-sheet>
@@ -165,6 +173,7 @@ import Especialidad from "./Especialidad.vue";
 import Citas from "./Cita.vue";
 import Usuarios from "./Usuario.vue";
 import Tratamientos from "./Tratamiento.vue";
+import Consultorios from "./Consultorio.vue";
 
 export default {
   data: () => ({
@@ -180,6 +189,7 @@ export default {
       { text: "Citas", icon: "mdi-calendar-month-outline" },
       { text: "Usuarios", icon: "mdi-account-supervisor-circle" },
       { text: "Tratamientos", icon: "mdi-air-filter" },
+      { text: "Consultorios", icon: "mdi-arrow-up-bold-box-outline" },
       { text: "Salir", icon: "mdi-exit-run" },
     ],
     mini: false,
@@ -197,9 +207,9 @@ export default {
   }),
 
   methods: {
-    salir(){
+    salir() {
       this.$router.push("/");
-    }
+    },
   },
 
   created() {
@@ -214,6 +224,7 @@ export default {
     Citas,
     Usuarios,
     Tratamientos,
+    Consultorios,
   },
 };
 </script>

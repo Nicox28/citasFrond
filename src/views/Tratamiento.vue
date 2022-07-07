@@ -66,7 +66,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="close">
-                  Cancel
+                  Cancelar
                 </v-btn>
                 <v-btn
                   v-if="editedIndex === -1"
@@ -74,7 +74,7 @@
                   text
                   @click="save"
                 >
-                  Save
+                  Guardar
                 </v-btn>
                 <v-btn v-else color="blue darken-1" text @click="editar">
                   Editar
@@ -84,16 +84,16 @@
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
-              <v-card-title class="text-h5"
-                >Are you sure you want to delete this item?</v-card-title
+              <v-card-title class="text-h7"
+                >Estas seguro de borrar este Tratamiento?</v-card-title
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeDelete"
-                  >Cancel</v-btn
+                  >Cancelar</v-btn
                 >
                 <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                  >OK</v-btn
+                  >Confirmar</v-btn
                 >
                 <v-spacer></v-spacer>
               </v-card-actions>
@@ -314,6 +314,7 @@ export default {
             )
             .then((res) => {
               console.log("yata exitoso", res);
+              this.listarTratamiento();
               this.close();
             })
             .catch((res) => {

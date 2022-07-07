@@ -66,7 +66,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="close">
-                  Cancel
+                  Cancelar
                 </v-btn>
                 <v-btn
                   v-if="editedIndex === -1"
@@ -74,7 +74,7 @@
                   text
                   @click="save"
                 >
-                  Save
+                  Guardar
                 </v-btn>
                 <v-btn v-else color="blue darken-1" text @click="editar">
                   Editar
@@ -84,8 +84,8 @@
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card>
-              <v-card-title class="text-h5"
-                >Estas seguro de borrar?</v-card-title
+              <v-card-title class="text-h8"
+                >Estas seguro de borrar Especialidad?</v-card-title
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -313,6 +313,7 @@ export default {
             )
             .then((res) => {
               console.log("yata exitoso", res);
+              this.listarEspecialidad()
               this.close();
             })
             .catch((res) => {

@@ -3,10 +3,8 @@
     <div class="d-flex flex-column justify-space-between align-center mt-5">
       <v-form ref="form" v-model="valid" lazy-validation>
         <template>
-          <v-card class="mx-auto" width="300" color="#BBDEFB" elevation="5">
-            MULTIDENT
-          </v-card>
-          <v-divider class="mx-4" inset vertical></v-divider>
+          <h1 color="red">¡Bienvenido!</h1>
+          <h4>Multident Buenos Aires</h4>
 
           <v-text-field
             v-model="user"
@@ -31,7 +29,9 @@
           >
             Ingresar
           </v-btn>
-          <v-alert color="red" type="error" :value="value">Contraseña Error</v-alert>
+          <v-alert color="red" type="error" :value="value"
+            >Contraseña Error</v-alert
+          >
         </template>
       </v-form>
     </div>
@@ -60,11 +60,11 @@ export default {
   }),
 
   methods: {
-    error(){
-this.value=true;
+    error() {
+      this.value = true;
     },
-    actualizar(){
-      this.value=false;
+    actualizar() {
+      this.value = false;
     },
     ingresar() {
       this.$refs.form.validate();
@@ -92,7 +92,7 @@ this.value=true;
                 );
               } else {
                 console.log("eres un impostor");
-                this.error()
+                this.error();
               }
             })
             .catch((res) => {
@@ -114,4 +114,6 @@ this.value=true;
   },
 };
 </script>
+
+
 
