@@ -50,24 +50,28 @@
                     <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.nomb_pac"
+                        :rules="nomRules"
                         label="NOMBRE"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.apellido_pac"
+                        :rules="apeRules"
                         label="APELLIDOS"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.direcc_pac"
+                        :rules="direRules"
                         label="DIRECCION"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.cel_pac"
+                        :rules="celRules"
                         label="CELULAR"
                         type="number"
                       ></v-text-field>
@@ -75,6 +79,7 @@
                     <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.docu_pac"
+                        :rules="docRules"
                         label="DOCUMENTO DE IDENTIDAD"
                         type="number"
                       ></v-text-field>
@@ -92,6 +97,7 @@
                         <template v-slot:activator="{ on, attrs }">
                           <v-text-field
                             v-model="editedItem.fecha_nac_pac"
+                            :rules="feRules"
                             label="Calendar"
                             prepend-icon="mdi-calendar"
                             readonly
@@ -125,6 +131,7 @@
                       outlined
                       solo
                       v-model="editedItem.sexo_pac"
+                      :rules="sexRules"
                       :items="items1"
                       label="sexo"
                     ></v-combobox>
@@ -145,6 +152,7 @@
                 >
                   Guardar
                 </v-btn>
+                
                 <v-btn v-else color="blue darken-1" text @click="editar">
                   Editar
                 </v-btn>
@@ -186,6 +194,34 @@ import axios from "axios";
 export const RUTA_SERVIDOR = process.env.VUE_APP_RUTA_API;
 export default {
   data: () => ({
+     nomRules: [
+      (v) => !!v || "Ingrese Nombre",
+      (v) => (v && v.length <=21) || "Excede el tamaño",
+    ],
+     apeRules: [
+      (v) => !!v || "Ingrese Apellidos",
+      (v) => (v && v.length <=21) || "Excede el tamaño",
+    ],
+     direRules: [
+      (v) => !!v || "Ingrese Direccion",
+      (v) => (v && v.length <=21) || "Excede el tamaño",
+    ],
+     celRules: [
+      (v) => !!v || "Ingrese el Celular",
+      (v) => (v && v.length ==9) || "el celular debe tener 9 digitos",
+    ],
+
+     docRules: [
+      (v) => !!v || "Ingrese el documento de identidad",
+      (v) => (v && v.length ==8 || v.length ==13) || "8 Numeros para DNI y 13 para carnet de Extranjeria",
+    ],
+     feRules: [
+      (v) => !!v || "Ingrese la Fecha de Nacimiento",
+    ],
+     sexRules: [
+      (v) => !!v || "Seleccione Sexo",
+    ],
+    select: null,
     date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
       .toISOString()
       .substr(0, 10),
@@ -438,13 +474,28 @@ export default {
       //this.close();
       //console.log("algo", this.desserts);
       console.log("algo2", this.editedItem);*/
+      var doc_val= this.editedItem.docu_pac.length
+      var cel_val= this.editedItem.cel_pac.length
+      console.log(doc_val)
+       
 
-      axios
+          if(doc_val==8 && cel_val==9  || doc_val==13 && cel_val==9){
+            //nacionalidad= " "
+            //if(this.editedItem.docu_pac.length==8){
+              //nacionalidad="peruana"
+          
+            //}
+            //else{
+              //nacionalidad="extranjera"
+            //}
+            axios
         .post(RUTA_SERVIDOR + "/api/token/", {
           username: "admin",
           password: "admin",
         })
         .then((response) => {
+
+         
           this.auth = "Bearer " + response.data.access;
           axios
             .post(
@@ -457,6 +508,7 @@ export default {
                 docu_pac: this.editedItem.docu_pac,
                 fecha_nac_pac: this.editedItem.fecha_nac_pac,
                 sexo_pac: this.editedItem.sexo_pac,
+                //nacionalidad_pac: nacionalidad,
               },
               {
                 headers: { Authorization: this.auth },
@@ -476,6 +528,8 @@ export default {
             ? console.warn("lo sientimos no tenemos servicios")
             : console.warn("Error:", response);
         });
+          }
+      
     },
   },
 };

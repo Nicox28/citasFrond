@@ -50,18 +50,21 @@
                     <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.nomb_per"
+                        :rules="nomRules"
                         label="NOMBRE"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.apellido_per"
+                        :rules="apeRules"
                         label="APELLIDOS"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.cel_per"
+                        :rules="celRules"
                         label="CELULAR"
                         type="number"
                       ></v-text-field>
@@ -69,8 +72,10 @@
                     <v-col cols="12" sm="6" md="6">
                       <v-text-field
                         v-model="editedItem.docu_per"
+                        :rules="docuRules"
                         label="DOCUMENTO DE IDENTIDAD"
                         type="number"
+                        
                       ></v-text-field>
                     </v-col>
                     <v-combobox
@@ -79,6 +84,7 @@
                       outlined
                       solo
                       v-model="editedItem.especialidad"
+                      :rules="espeRules"
                       :items="itemsCombo"
                       label="especialidad"
                     ></v-combobox>
@@ -88,6 +94,7 @@
                       outlined
                       solo
                       v-model="editedItem.cat_per"
+                      :rules="catRules"
                       :items="items1"
                       label="categoria"
                     ></v-combobox>
@@ -97,6 +104,7 @@
                       outlined
                       solo
                       v-model="editedItem.sexo_per"
+                      :rules="sexRules"
                       :items="items3"
                       label="sexo"
                     ></v-combobox>
@@ -155,10 +163,38 @@
 </template>
   
   <script>
-import axios from "axios";
+import axios from "axios"; 
+
 export const RUTA_SERVIDOR = process.env.VUE_APP_RUTA_API;
 export default {
   data: () => ({
+     nomb_per:"",
+     nomRules: [
+      (v) => !!v || "Campo Requerido",
+      (v) => (v && v.length <=21) || "Excede el tamaño",
+    ],
+     apeRules: [
+      (v) => !!v || "Apellidos Obligatorio",
+      (v) => (v && v.length <=21) || "Excede el tamaño",
+    ],
+     celRules: [
+      (v) => !!v || "Ingrese el Celular",
+      (v) => (v && v.length ==9) || "el celular debe tener 9 digitos",
+    ],
+     docuRules: [
+      (v) => !!v || "Ingrese el documento de identidad",
+      (v) => (v && v.length ==8 || v.length ==13) || "8 Numeros para DNI y 13 para carnet de Extranjeria",
+    ],
+     espeRules: [
+      (v) => !!v || "Ingrese la Especialidad",
+    ],
+    catRules: [
+      (v) => !!v || "Ingrese la Categoria del Personal",
+    ],
+     sexRules: [
+      (v) => !!v || "Seleccione Sexo",
+    ],
+    
     itemsCombo: [],
     model: ["editedItem.especialidad"],
     search: "",
@@ -477,8 +513,15 @@ export default {
       //this.close();
       //console.log("algo", this.desserts);
       console.log("algo2", this.editedItem);*/
+      var doc_val= this.editedItem.docu_per.length
+      var cel_val= this.editedItem.cel_per.length
+      console.log(doc_val)
+      
+          if(doc_val==8 && cel_val==9  || doc_val==13 && cel_val==9){
+            //if(this.editedItem.docu_per==8)
+            
 
-      axios
+            axios
         .post(RUTA_SERVIDOR + "/api/token/", {
           username: "admin",
           password: "admin",
@@ -515,6 +558,10 @@ export default {
             ? console.warn("lo sientimos no tenemos servicios")
             : console.warn("Error:", response);
         });
+          }
+          else{
+            
+         }
     },
   },
 };
