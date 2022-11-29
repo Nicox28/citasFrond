@@ -47,6 +47,17 @@
               <v-card-text>
                 <v-container>
                   <v-row>
+                    <v-col cols="12" sm="6" md="6">
+                      <v-text-field
+                        v-model="docuPersonal"
+                        label="DOCUMENTO DE IDENTIDAD"
+                        required
+                      ></v-text-field>
+                      <v-btn @click="buscarPersonal" color="primary">
+                        <span>Buscar</span>
+                        <v-icon>mdi-magnify</v-icon>
+                      </v-btn>
+                    </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.login"
@@ -61,13 +72,13 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.nomb"
+                        v-model="editedItem.nomb_per"
                         label="NOMBRE"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.apellido"
+                        v-model="editedItem.apellido_per"
                         label="APELLIDOS"
                       ></v-text-field>
                     </v-col>
@@ -138,6 +149,8 @@ export default {
     search: "",
     search1: "",
     dialog: false,
+    docuPersonal:"",
+    urlPersonal: "",
     dialogDelete: false,
     dialogProg: false,
     headers: [
@@ -156,24 +169,28 @@ export default {
     desserts: [],
     editedIndex: -1,
     editedItem: {
+      urlPersonal: "",
+      datosPersonal: {},
       login: "",
       clave: "",
-      nomb: "",
-      apellido: "",
+      nomb_per: "",
+      apellido_per: "",
       perfil: "",
     },
     defaultItem: {
+      urlPersonal: "",
+      datosPersonal: {},
       login: "",
       clave: "",
-      nomb: "",
-      apellido: "",
+      nomb_per: "",
+      apellido_per: "",
       perfil: "",
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "NUEVO USUARIO" : "Edit Item";
+      return this.editedIndex === -1 ? "NUEVO USUARIO" : "EDITAR USUARIO";
     },
   },
 
@@ -222,6 +239,37 @@ export default {
   },
 
   methods: {
+
+    buscarPersonal() {
+      axios
+        .post(RUTA_SERVIDOR + "/api/token/", {
+          username: "admin",
+          password: "admin",
+        })
+        .then((response) => {
+          this.auth = "Bearer " + response.data.access;
+          axios
+            .get(RUTA_SERVIDOR + "personal/?search=" + this.docuPersonal, {
+              headers: { Authorization: this.auth },
+            })
+            .then((res) => {
+              console.log("personal encontrado", res.data);
+              this.editedItem.nomb_per = res.data[0].nomb_per;
+              this.editedItem.apellido_per = res.data[0].apellido_per;
+              this.editedItem.urlPersonal = res.data[0].url;
+              console.log("personal url", this.editedItem.urlPersonal);
+            })
+            .catch((res) => {
+              console.log("Error:", res);
+              this.dialogProg = false;
+            });
+        })
+        .catch((response) => {
+          response === 404
+            ? console.warn("lo sientimos no tenemos servicios")
+            : console.warn("Error:", response);
+        });
+    },
     initialize() {
       this.desserts = [
         {
@@ -386,12 +434,13 @@ export default {
           this.auth = "Bearer " + response.data.access;
           axios
             .post(
-              RUTA_SERVIDOR + "/usuario/",
+              RUTA_SERVIDOR + "usuario/",
               {
+                personal: this.editedItem.urlPersonal,
                 login: this.editedItem.login,
                 clave: this.editedItem.clave,
-                nomb: this.editedItem.nomb,
-                apellido: this.editedItem.apellido,
+                nomb: this.editedItem.nomb_per,
+                apellido: this.editedItem.apellido_per,
                 perfil: this.editedItem.perfil,
               },
               {

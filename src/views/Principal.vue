@@ -48,7 +48,7 @@
               <v-divider></v-divider>
               <v-list nav dense>
                 <v-list-item-group v-model="selectedItem" color="primary">
-                  <v-list-item v-if="perfil == 1 || perfil == 3|| perfil == 2">
+                  <v-list-item v-if="perfil == 1 || perfil == 3">
                     <v-list-item-icon>
                       <v-icon v-text="items[0].icon"></v-icon>
                     </v-list-item-icon>
@@ -82,6 +82,7 @@
                     </v-list-item-content>
                   </v-list-item>
                   
+                  
                   <v-list-item v-if="perfil == 3">
                     <v-list-item-icon>
                       <v-icon v-text="items[4].icon"></v-icon>
@@ -94,7 +95,7 @@
                     </v-list-item-content>
                   </v-list-item>
 
-                  <v-list-item v-if="perfil == 1 || perfil == 3">
+                  <v-list-item v-if="perfil == 3">
                     <v-list-item-icon>
                       <v-icon v-text="items[5].icon"></v-icon>
                     </v-list-item-icon>
@@ -106,9 +107,7 @@
                     </v-list-item-content>
                   </v-list-item>
 
-                  
-
-                   <v-list-item v-if="perfil == 1 || perfil == 3">
+                   <v-list-item v-if="perfil == 3">
                     <v-list-item-icon>
                       <v-icon v-text="items[7].icon"></v-icon>
                     </v-list-item-icon>
@@ -120,6 +119,30 @@
                     </v-list-item-content>
                   </v-list-item>
 
+                  <v-list-item v-if="perfil == 1 || perfil == 3 || perfil == 2">
+                    <v-list-item-icon>
+                      <v-icon v-text="items[8].icon"></v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-text="items[8].text"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item v-if=" perfil == 1 || perfil == 3 || perfil == 2">
+                    <v-list-item-icon>
+                      <v-icon v-text="items[9].icon"></v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-text="items[9].text"
+                      ></v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+
                   <v-list-item>
                     <v-btn
                       depressed
@@ -127,6 +150,7 @@
                       outlined
                       plain
                       raised
+                      color ="primary"
                       @click="salir"
                       >SALIR</v-btn
                     >
@@ -140,16 +164,21 @@
           <div v-if="selectedItem == 0 && perfil == 3"><Paciente /></div>
           <div v-if="selectedItem == 1 && perfil == 3"><Personal /></div>
           <div v-if="selectedItem == 2 && perfil == 3"><Especialidad /></div>
+          
           <div v-if="selectedItem == 3 && perfil == 3"><Usuarios /></div>
           <div v-if="selectedItem == 4 && perfil == 3"><Tratamientos /></div>
+          
           <div v-if="selectedItem == 5 && perfil == 3"><Enfermedad /></div>
+          <div v-if="selectedItem == 6 && perfil == 3"><Historial /></div>
+          <div v-if="selectedItem == 7 && perfil == 3"><ReTrata /></div>
 
           <div v-if="selectedItem == 0 && perfil == 1"><Paciente /></div> 
-          <div v-if="selectedItem == 1 && perfil == 1"><Tratamientos /></div>
-          <div v-if="selectedItem == 2 && perfil == 1"><Enfermedad /></div>
+          <div v-if="selectedItem == 1 && perfil == 1"><Historial /></div>
+          <div v-if="selectedItem == 2 && perfil == 1"><ReTrata /></div>
           
 
-          <div v-if="selectedItem == 0 && perfil == 2"><Paciente /></div>
+          <div v-if="selectedItem == 0 && perfil == 2"><Historial /></div>
+          <div v-if="selectedItem == 1 && perfil == 2"><ReTrata /></div>
         </div>
       </div>
     </v-sheet>
@@ -166,6 +195,8 @@ import Usuarios from "./Usuario.vue";
 import Tratamientos from "./Tratamiento.vue";
 import Consultorios from "./Consultorio.vue";
 import Enfermedad from "./Enfermedad.vue";
+import Historial from "./Historial.vue";
+import ReTrata from "./ReTrata.vue";
 
 export default {
   data: () => ({
@@ -181,8 +212,10 @@ export default {
       { text: "Citas", icon: "mdi-calendar-month-outline" },
       { text: "Usuarios", icon: "mdi-account-supervisor-circle" },
       { text: "Tratamientos", icon: "mdi-air-filter" },
-      { text: "Consultorios", icon: "mdi-arrow-up-bold-box-outline" },
-      { text: "Enfermedad", icon: "mdi-arrow-up-bold-box-outline" },
+      { text: "Consultorios", icon: "mdi-home" },
+      { text: "Enfermedad", icon: "mdi-plus-box-outline" },
+      { text: "Historial", icon: "mdi-book-open-outline" },
+      { text: "Record de Tratamiento", icon: "mdi-view-list" },
       { text: "Salir", icon: "mdi-exit-run" },
     ],
     mini: false,
@@ -219,6 +252,8 @@ export default {
     Tratamientos,
     Consultorios,
     Enfermedad,
+    Historial,
+    ReTrata
   },
 };
 </script>

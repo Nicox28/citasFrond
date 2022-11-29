@@ -90,6 +90,7 @@ export default {
                   "nombre",
                   res.data[0].nomb + " " + res.data[0].apellido
                 );
+                sessionStorage.setItem("urlPersonal", res.data[0].datosPersonal.url)
               } else {
                 console.log("eres un impostor");
                 this.error();

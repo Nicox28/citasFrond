@@ -204,7 +204,7 @@ export default {
     ],
      direRules: [
       (v) => !!v || "Ingrese Direccion",
-      (v) => (v && v.length <=21) || "Excede el tamaño",
+      (v) => (v && v.length <=31) || "Excede el tamaño",
     ],
      celRules: [
       (v) => !!v || "Ingrese el Celular",
@@ -273,7 +273,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "NUEVO PACIENTE" : "Edit Item";
+      return this.editedIndex === -1 ? "NUEVO PACIENTE" : "EDITAR PACIENTE";
     },
   },
 

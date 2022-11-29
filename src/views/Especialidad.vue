@@ -145,7 +145,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Nueva Especialidad" : "Edit Item";
+      return this.editedIndex === -1 ? "Nueva Especialidad" : "EDITAR ESPECIALIDAD";
     },
   },
 
@@ -231,7 +231,7 @@ export default {
       this.editedIndex = this.desserts.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-      console.log("valorItem", this.editedItem.url.split("/")[4])
+      console.log("valorItem", this.editedItem.url.split("/")[4]);
     },
 
     deleteItem(item) {
@@ -313,7 +313,7 @@ export default {
             )
             .then((res) => {
               console.log("yata exitoso", res);
-              this.listarEspecialidad()
+              this.listarEspecialidad();
               this.close();
             })
             .catch((res) => {

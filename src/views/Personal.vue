@@ -246,7 +246,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "NUEVO PERSONAL" : "Edit Item";
+      return this.editedIndex === -1 ? "NUEVO PERSONAL" : "EDITAR PERSONAL";
     },
   },
 

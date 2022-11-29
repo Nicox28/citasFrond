@@ -145,7 +145,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Nuevo Tratamiento" : "Edit Item";
+      return this.editedIndex === -1 ? "Nuevo Tratamiento" : "EDITAR TRATAMIENTO";
     },
   },
 
